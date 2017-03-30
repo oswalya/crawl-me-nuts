@@ -28,6 +28,15 @@ class Product:
     def toJson(self):
         return json.dumps({'asin': self.asin, 'name': self.name, 'price_new': self.new, 'price_used': self.used, 'price_diff': str(self.getDiff()), 'link': self.link})
 
+class SearchItem:
+    def __init__(self, name, url, useExternal, ext_baseurl, ext_xpath, ext_name_cut):
+        self.name = name
+        self.url = url
+        self.useExternal = useExternal
+        self.ext_baseurl = ext_baseurl
+        self.ext_xpath = ext_xpath
+        self.ext_name_cut = ext_name_cut
+
 class Xpathdef:
     _NEXT_PAGE = '//a[@id="pagnNextLink"]'
     _PRODUCT = '//li[contains(@id,"result_")]'
@@ -39,22 +48,23 @@ class Xpathdef:
 global MAX_PAGE_COUNT;
 global MIN_PERCENT_SAVING
 
-def getProductDetailsPage(url):
+def getProductDetailsPage(searchItem):
     headers = {'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/42.0.2311.90 Safari/537.36'}
     COUNTER = 1
+    logging.info('Scanning product pages for: ' + searchItem.name)
 
     while True:
         logging.debug('======PAGE '+ xstr(COUNTER) + '======')
-        mod_url = url + '&page=' + xstr(COUNTER)
+        mod_url = searchItem.url + '&page=' + xstr(COUNTER)
         COUNTER = COUNTER + 1
         page = requests.get(mod_url,headers=headers)
         doc = html.fromstring(page.content)
-        readProductDetails(doc)
+        readProductDetails(doc, searchItem)
         if (not doc.xpath(Xpathdef._NEXT_PAGE)) or (COUNTER > MAX_PAGE_COUNT):
             break
 
 
-def readProductDetails(document):
+def readProductDetails(document, searchItem):
     for i in document.xpath(Xpathdef._PRODUCT):
         # print(html.tostring(i, pretty_print=True))
         RAW_NAME = i.xpath(Xpathdef._NAME)
@@ -68,30 +78,36 @@ def readProductDetails(document):
         USED_PRICE = re.sub(r'[^\d,]', '', str(RAW_USED_PRICE[0])).replace(',', '.') if RAW_USED_PRICE else None
         LINK = 'https://www.amazon.de/gp/offer-listing/' + ASIN if RAW_ASIN else None
 
-        saveItem(Product(ASIN, NAME, NEW_PRICE, USED_PRICE, LINK))
+        p = Product(ASIN, NAME, NEW_PRICE, USED_PRICE, LINK)
+        if searchItem.useExternal:
+            logging.debug('Trying to get more price information from external site for: ' + p.name)
+            price = getNewPrice(p.name, searchItem)
+            if price:
+                logging.debug('Found price: ' + price)
+        saveItem(p)
 
 def saveItem(product):
     if not isinstance(product, Product):
         raise ValueError('Object must be an instance of Product!')
     # if product.used and not product.new:
         # product.new = getNewPrice(product.name)
-    if (product.getDiff() and product.getDiff() > MIN_PERCENT_SAVING) or (product.used and not product.new):
+    # if (product.getDiff() and product.getDiff() > MIN_PERCENT_SAVING) or (product.used and not product.new):
+    #     logging.info(product.toJson())
+    if (product.getDiff() and product.getDiff() > MIN_PERCENT_SAVING):
         logging.info(product.toJson())
 
 #TODO: WIP external price check
-def getNewPrice(name):
+def getNewPrice(name, searchItem):
     headers = {'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/42.0.2311.90 Safari/537.36'}
-    logging.info('name: ' + name)
-    search_name = name.split(' ', 2)
-    del search_name[-1]
-    searchBaseUrl = 'http://www.pricerunner.de/search?q='
-    searchUrl = searchBaseUrl + '+'.join(search_name)
-    logging.info('searchurl: ' + searchUrl )
+    search_name = name.split(' ', searchItem.ext_name_cut)
+    if len(search_name) > searchItem.ext_name_cut:
+        del search_name[-1]
+    searchUrl = searchItem.ext_baseurl + '+'.join(search_name)
+    logging.debug('searchurl: ' + searchUrl )
     r = requests.get(searchUrl,headers=headers)
     doc = html.fromstring(r.content)
-    raw_price = doc.xpath('//span[@class="amount"]/text()')
+    raw_price = doc.xpath(searchItem.ext_xpath)
     price = re.sub(r'[^\d,]', '', str(raw_price[0])).replace(',', '.') if raw_price else None
-    logging.info('price: ' + xstr(price))
     return price
 
 def xstr(s):
@@ -100,30 +116,27 @@ def xstr(s):
     return str(s)
 
 def run(filename):
-    with open(filename) as f:
-        content = f.readlines()
-    for line in content:
-        s = line.strip()
-        if s == "":
-            logging.debug('empty line, skipping....')
-            continue
-        if s.startswith('#'):
-            logging.debug('commented out, skipping...')
-            continue
-        logging.info(line.strip() + "\n------------------------------------------------------\n")
-        getProductDetailsPage(line.strip())
+    searchItems = loadYaml(filename)
+    for item in searchItems:
+        getProductDetailsPage(item)
 
-#TODO: WIP yaml load
 def loadYaml(filename):
     f = open(filename)
-    pageList = yaml.load(f)
+    itemList = yaml.load(f)
     f.close()
-    for page in pageList:
-        print '-->' + i['name']
+    searchItems = []
+    for item in itemList:
+        if not item['url']:
+            logging.debug(item['name'] + ' will be skipped: url empty / commented out....')
+            continue
+        item = SearchItem(item['name'], item['url'].strip() ,item['external_price'], item['external_price_baseurl'], item['external_price_xpath'], item['external_price_cut_name'])
+        logging.info('Adding SearchItem: ' + item.name)
+        searchItems.append(item)
+    return searchItems
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Get crawling boundaries')
-    parser.add_argument('-f', '--file', help='the file containing all urls to crawl. Defaults to: pages.txt', default='pages.txt')
+    parser.add_argument('-f', '--file', help='the file containing all urls to crawl. Defaults to: pages.yml', default='pages.yml')
     parser.add_argument('-s', '--saving', help='minimal percentage saving (default 30.0)', default=30.0, type=Decimal)
     parser.add_argument('-p', '--pages', help='Max pages to search (default 50)', default=50, type=int)
     parser.add_argument('-v', '--verbose', help='enable more verbose output', action="store_true")
@@ -138,4 +151,3 @@ if __name__ == "__main__":
     MAX_PAGE_COUNT = args.pages
 
     run(args.file)
-    # loadYaml(args.file)
