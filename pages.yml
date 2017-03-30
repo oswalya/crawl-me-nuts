@@ -1,0 +1,16 @@
+---
+- name: TVs
+  url: https://www.amazon.de/gp/search/ref=sr_nr_p_89_0?fst=as%3Aoff&rh=n%3A562066%2Cn%3A%21569604%2Cn%3A761254%2Cn%3A1197292%2Cp_n_size_browse-bin%3A9590317031%7C9590316031%2Cp_n_feature_two_browse-bin%3A2711619031%2Cp_6%3AA8KICS1PHF7ZO%7CA3JWKAKR8XB7XF%2Cp_89%3ALG+Electronics&bbn=1197292&ie=UTF8&qid=1490774546
+  external_price: true
+  external_price_baseurl: http://www.pricerunner.de/search?q=
+  external_price_cut_name: 2
+- name: IRobot
+  url: https://www.amazon.de/s/ref=sr_nr_p_6_3?fst=as%3Aoff&rh=n%3A3167641%2Cn%3A3597047031%2Cn%3A3597086031%2Cn%3A3597117031%2Cn%3A3597120031%2Ck%3Aroomba%2Cp_89%3AiRobot%2Cp_6%3AA3JWKAKR8XB7XF%7CA8KICS1PHF7ZO&bbn=3597120031&keywords=roomba&ie=UTF8&qid=1490782066&rnid=419115031
+  external_price: true
+  external_price_baseurl: http://www.pricerunner.de/search?q=
+  external_price_cut_name: 3
+- name: Werkzeug
+  url: https://www.amazon.de/s/ref=sr_ex_n_1?rh=n%3A80084031%2Cn%3A%2180085031%2Cn%3A2076939031%2Cn%3A2077416031%2Cp_89%3ABosch+Professional%7CMakita%2Cp_6%3AA3JWKAKR8XB7XF%7CA8KICS1PHF7ZO&bbn=2077416031&ie=UTF8&qid=1490854915
+  external_price: false
+  external_price_baseurl:
+  external_price_cut_name:

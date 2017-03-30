@@ -8,6 +8,7 @@ import re
 import inspect
 import logging
 import argparse
+import yaml
 
 class Product:
     def __init__(self, asin, name, price_new, price_used, link):
@@ -72,8 +73,26 @@ def readProductDetails(document):
 def saveItem(product):
     if not isinstance(product, Product):
         raise ValueError('Object must be an instance of Product!')
-    if product.getDiff() and product.getDiff() > MIN_PERCENT_SAVING:
+    # if product.used and not product.new:
+        # product.new = getNewPrice(product.name)
+    if (product.getDiff() and product.getDiff() > MIN_PERCENT_SAVING) or (product.used and not product.new):
         logging.info(product.toJson())
+
+#TODO: WIP external price check
+def getNewPrice(name):
+    headers = {'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/42.0.2311.90 Safari/537.36'}
+    logging.info('name: ' + name)
+    search_name = name.split(' ', 2)
+    del search_name[-1]
+    searchBaseUrl = 'http://www.pricerunner.de/search?q='
+    searchUrl = searchBaseUrl + '+'.join(search_name)
+    logging.info('searchurl: ' + searchUrl )
+    r = requests.get(searchUrl,headers=headers)
+    doc = html.fromstring(r.content)
+    raw_price = doc.xpath('//span[@class="amount"]/text()')
+    price = re.sub(r'[^\d,]', '', str(raw_price[0])).replace(',', '.') if raw_price else None
+    logging.info('price: ' + xstr(price))
+    return price
 
 def xstr(s):
     if s is None:
@@ -94,9 +113,15 @@ def run(filename):
         logging.info(line.strip() + "\n------------------------------------------------------\n")
         getProductDetailsPage(line.strip())
 
+#TODO: WIP yaml load
+def loadYaml(filename):
+    f = open(filename)
+    pageList = yaml.load(f)
+    f.close()
+    for page in pageList:
+        print '-->' + i['name']
 
 if __name__ == "__main__":
-    # Run('/home/bjess/workspace/python/amazon_crawler/pages.txt')
     parser = argparse.ArgumentParser(description='Get crawling boundaries')
     parser.add_argument('-f', '--file', help='the file containing all urls to crawl. Defaults to: pages.txt', default='pages.txt')
     parser.add_argument('-s', '--saving', help='minimal percentage saving (default 30.0)', default=30.0, type=Decimal)
@@ -113,3 +138,4 @@ if __name__ == "__main__":
     MAX_PAGE_COUNT = args.pages
 
     run(args.file)
+    # loadYaml(args.file)
