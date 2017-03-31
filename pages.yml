@@ -5,15 +5,22 @@
   external_price_baseurl: http://www.pricerunner.de/search?q=
   external_price_xpath: //span[@class="amount"]/text()
   external_price_cut_name: 2
+  asin_base_url: https://www.amazon.de/gp/offer-listing/
 - name: IRobot
   url: https://www.amazon.de/s/ref=sr_nr_p_6_3?fst=as%3Aoff&rh=n%3A3167641%2Cn%3A3597047031%2Cn%3A3597086031%2Cn%3A3597117031%2Cn%3A3597120031%2Ck%3Aroomba%2Cp_89%3AiRobot%2Cp_6%3AA3JWKAKR8XB7XF%7CA8KICS1PHF7ZO&bbn=3597120031&keywords=roomba&ie=UTF8&qid=1490782066&rnid=419115031
   external_price: true
   external_price_baseurl: http://www.pricerunner.de/search?q=
   external_price_xpath: //span[@class="amount"]/text()
   external_price_cut_name: 3
+  asin_base_url: https://www.amazon.de/gp/offer-listing/
 - name: Werkzeug
-  url: #https://www.amazon.de/s/ref=sr_ex_n_1?rh=n%3A80084031%2Cn%3A%2180085031%2Cn%3A2076939031%2Cn%3A2077416031%2Cp_89%3ABosch+Professional%7CMakita%2Cp_6%3AA3JWKAKR8XB7XF%7CA8KICS1PHF7ZO&bbn=2077416031&ie=UTF8&qid=1490854915
-  external_price: false
-  external_price_baseurl:
-  external_price_xpath:
-  external_price_cut_name:
+  url: https://www.amazon.de/s/ref=sr_ex_n_1?rh=n%3A80084031%2Cn%3A%2180085031%2Cn%3A2076939031%2Cn%3A2077416031%2Cp_89%3ABosch+Professional%7CMakita%2Cp_6%3AA3JWKAKR8XB7XF%7CA8KICS1PHF7ZO&bbn=2077416031&ie=UTF8&qid=1490854915
+  # external_price: false
+  # external_price_baseurl:
+  # external_price_xpath:
+  # external_price_cut_name:
+  external_price: true
+  external_price_baseurl: http://www.pricerunner.de/search?q=
+  external_price_xpath: //span[@class="amount"]/text()
+  external_price_cut_name: 5
+  asin_base_url: https://www.amazon.de/gp/offer-listing/
