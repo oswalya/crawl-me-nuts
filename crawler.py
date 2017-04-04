@@ -55,7 +55,7 @@ class Xpathdef:
     _NAME = './/a[@class="a-link-normal s-access-detail-page  s-color-twister-title-link a-text-normal"]'
     _PRICE_NEW = './/span[@class="a-size-base a-color-price s-price a-text-bold"]/text()'
     _PRICE_USED = './/span[@class="a-size-base a-color-price a-text-bold"]/text()'
-    _WHD_IMG = '//img[@alt="Warehouse Deals"]'
+    _WHD_IMG = '//img[@alt="Warehouse Deals"] or //img[contains(@alt,"Amazon - Offres")]'
 
 
 global MAX_PAGE_COUNT
