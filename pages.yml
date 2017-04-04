@@ -1,26 +1,37 @@
 ---
 - name: TVs
-  url: https://www.amazon.de/gp/search/ref=sr_nr_p_89_0?fst=as%3Aoff&rh=n%3A562066%2Cn%3A%21569604%2Cn%3A761254%2Cn%3A1197292%2Cp_n_size_browse-bin%3A9590317031%7C9590316031%2Cp_n_feature_two_browse-bin%3A2711619031%2Cp_6%3AA8KICS1PHF7ZO%7CA3JWKAKR8XB7XF%2Cp_89%3ALG+Electronics&bbn=1197292&ie=UTF8&qid=1490774546
+  url: #https://www.amazon.de/gp/search/ref=sr_nr_p_89_0?fst=as%3Aoff&rh=n%3A562066%2Cn%3A%21569604%2Cn%3A761254%2Cn%3A1197292%2Cp_n_size_browse-bin%3A9590317031%7C9590316031%2Cp_n_feature_two_browse-bin%3A2711619031%2Cp_6%3AA8KICS1PHF7ZO%7CA3JWKAKR8XB7XF%2Cp_89%3ALG+Electronics&bbn=1197292&ie=UTF8&qid=1490774546
   external_price: true
   external_price_baseurl: http://www.pricerunner.de/search?q=
   external_price_xpath: //span[@class="amount"]/text()
   external_price_cut_name: 2
   asin_base_url: https://www.amazon.de/gp/offer-listing/
 - name: IRobot
-  url: https://www.amazon.de/s/ref=sr_nr_p_6_3?fst=as%3Aoff&rh=n%3A3167641%2Cn%3A3597047031%2Cn%3A3597086031%2Cn%3A3597117031%2Cn%3A3597120031%2Ck%3Aroomba%2Cp_89%3AiRobot%2Cp_6%3AA3JWKAKR8XB7XF%7CA8KICS1PHF7ZO&bbn=3597120031&keywords=roomba&ie=UTF8&qid=1490782066&rnid=419115031
+  url: #https://www.amazon.de/s/ref=sr_nr_p_6_3?fst=as%3Aoff&rh=n%3A3167641%2Cn%3A3597047031%2Cn%3A3597086031%2Cn%3A3597117031%2Cn%3A3597120031%2Ck%3Aroomba%2Cp_89%3AiRobot%2Cp_6%3AA3JWKAKR8XB7XF%7CA8KICS1PHF7ZO&bbn=3597120031&keywords=roomba&ie=UTF8&qid=1490782066&rnid=419115031
   external_price: true
   external_price_baseurl: http://www.pricerunner.de/search?q=
   external_price_xpath: //span[@class="amount"]/text()
   external_price_cut_name: 3
   asin_base_url: https://www.amazon.de/gp/offer-listing/
 - name: Werkzeug
-  url: https://www.amazon.de/s/ref=sr_ex_n_1?rh=n%3A80084031%2Cn%3A%2180085031%2Cn%3A2076939031%2Cn%3A2077416031%2Cp_89%3ABosch+Professional%7CMakita%2Cp_6%3AA3JWKAKR8XB7XF%7CA8KICS1PHF7ZO&bbn=2077416031&ie=UTF8&qid=1490854915
+  url: #https://www.amazon.de/s/ref=sr_ex_n_1?rh=n%3A80084031%2Cn%3A%2180085031%2Cn%3A2076939031%2Cn%3A2077416031%2Cp_89%3ABosch+Professional%7CMakita%2Cp_6%3AA3JWKAKR8XB7XF%7CA8KICS1PHF7ZO&bbn=2077416031&ie=UTF8&qid=1490854915
   # external_price: false
   # external_price_baseurl:
   # external_price_xpath:
   # external_price_cut_name:
-  external_price: true
+  external_price: false
   external_price_baseurl: http://www.pricerunner.de/search?q=
   external_price_xpath: //span[@class="amount"]/text()
   external_price_cut_name: 5
   asin_base_url: https://www.amazon.de/gp/offer-listing/
+- name: Werkzeug FR
+  url: https://www.amazon.fr/s/ref=sr_nr_p_36_6?rnid=1715341031&rh=n%3A590748031%2Cn%3A%21590749031%2Cn%3A1716189031%2Cp_89%3AMakita%7CBosch+Professional%2Cp_6%3AA1X6FK5RDHNB96%7CA2CVHYRTWLQO9T&qid=1491283176&__mk_fr_FR=%C3%85M%C3%85Z%C3%95%C3%91&bbn=1716189031&low-price=30&high-price=&x=4&y=17
+  # external_price: false
+  # external_price_baseurl:
+  # external_price_xpath:
+  # external_price_cut_name:
+  external_price: false
+  external_price_baseurl: http://www.pricerunner.de/search?q=
+  external_price_xpath: //span[@class="amount"]/text()
+  external_price_cut_name: 5
+  asin_base_url: https://www.amazon.fr/gp/offer-listing/

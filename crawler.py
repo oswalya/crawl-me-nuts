@@ -27,8 +27,15 @@ class Product:
         value_used = Decimal(self.used)
         return 100 * (value_new - value_used) / value_new
 
+    def getDiffExternal(self):
+        if (self.external is None) or (self.used is None):
+            return None
+        value_new = Decimal(self.external)
+        value_used = Decimal(self.used)
+        return 100 * (value_new - value_used) / value_new
+
     def toJson(self):
-        return json.dumps({'asin': self.asin, 'name': self.name, 'price_new': self.new, 'price_used': self.used, 'price_external': self.external, 'price_diff': str(self.getDiff()), 'link': self.link})
+        return json.dumps({'asin': self.asin, 'name': self.name, 'price_new': self.new, 'price_used': self.used, 'price_external': self.external, 'price_diff': str(self.getDiff()), 'price_diff_ext': str(self.getDiffExternal()), 'link': self.link})
 
 #TODO: Add documentation
 class SearchItem:
@@ -48,6 +55,7 @@ class Xpathdef:
     _NAME = './/a[@class="a-link-normal s-access-detail-page  s-color-twister-title-link a-text-normal"]'
     _PRICE_NEW = './/span[@class="a-size-base a-color-price s-price a-text-bold"]/text()'
     _PRICE_USED = './/span[@class="a-size-base a-color-price a-text-bold"]/text()'
+    _WHD_IMG = '//img[@alt="Warehouse Deals"]'
 
 
 global MAX_PAGE_COUNT
@@ -70,7 +78,7 @@ def getProductDetailsPage(searchItem):
         mod_url = searchItem.url + '&page=' + xstr(COUNTER)
         COUNTER = COUNTER + 1
         page = requests.get(mod_url,headers=headers)
-        doc = html.fromstring(page.content)
+        doc = html.fromstring(page.content.decode('UTF-8'))
         readProductDetails(doc, searchItem)
         if (not doc.xpath(Xpathdef._NEXT_PAGE)) or (COUNTER > MAX_PAGE_COUNT):
             break
@@ -84,20 +92,30 @@ def readProductDetails(document, searchItem):
         RAW_USED_PRICE = i.xpath(Xpathdef._PRICE_USED)
         RAW_ASIN = i.get('data-asin')
 
-        NAME = RAW_NAME[0].get('title').encode('utf-8') if RAW_NAME else None
+        NAME = RAW_NAME[0].get('title') if RAW_NAME else None
         ASIN = RAW_ASIN if RAW_ASIN else None
         NEW_PRICE = re.sub(r'[^\d,]', '', str(RAW_NEW_PRICE[0])).replace(',', '.') if RAW_NEW_PRICE else None
         USED_PRICE = re.sub(r'[^\d,]', '', str(RAW_USED_PRICE[0])).replace(',', '.') if RAW_USED_PRICE else None
         LINK = searchItem.asin_base_url + '' + ASIN if RAW_ASIN else None
 
-        p = Product(ASIN, NAME, NEW_PRICE, USED_PRICE, LINK)
-        if searchItem.useExternal:
-            logging.debug('Trying to get more price information from external site for: ' + p.name)
-            price = getNewPrice(p.name, searchItem)
-            if price:
-                logging.debug('Found price: ' + price)
-                p.external = price
-        saveItem(p)
+        if isWHD(LINK):
+            p = Product(ASIN, NAME, NEW_PRICE, USED_PRICE, LINK)
+            if searchItem.useExternal:
+                logging.debug('Trying to get more price information from external site for: ' + p.name)
+                price = getNewPrice(p.name, searchItem)
+                if price:
+                    logging.debug('Found price: ' + price)
+                    p.external = price
+            saveItem(p)
+
+#TODO: Add documentation
+def isWHD(link):
+    if not link:
+        return None
+    page = requests.get(link,headers=headers)
+    doc = html.fromstring(page.content.decode('UTF-8'))
+
+    return doc.xpath(Xpathdef._WHD_IMG)
 
 #TODO: Add documentation
 def saveItem(product):
@@ -107,7 +125,7 @@ def saveItem(product):
         # product.new = getNewPrice(product.name)
     # if (product.getDiff() and product.getDiff() > MIN_PERCENT_SAVING) or (product.used and not product.new):
     #     logging.info(product.toJson())
-    if (product.getDiff() and product.getDiff() > MIN_PERCENT_SAVING):
+    if (product.getDiff() and product.getDiff() > MIN_PERCENT_SAVING) or (product.getDiffExternal() and product.getDiffExternal() > MIN_PERCENT_SAVING):
         logging.info(product.toJson())
 
 #TODO: Add documentation
